@@ -1,0 +1,26 @@
+body{
+  font-family:"Microsoft YaHei"
+}
+.table,
+.table td,
+.table th{
+  text-align: center;
+  vertical-align: middle !important;
+  font-size:13px;
+  border:1px solid #ddd;
+
+}
+.break-all{
+  word-break: break-all;
+}
+.deleting{
+  color:#f00;
+}
+.nowrap{
+  display: inline-block;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+a{
+  cursor: pointer;
+}

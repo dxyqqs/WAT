@@ -1,0 +1,25 @@
+{
+    "siteData": [
+        {
+            "siteName": "zh_HK",
+            "sitePath": "/content/webex/global/zh_HK",
+            "siteHost": [
+                {
+                  "name":"DEV",
+                  "BL": "http://wbxapp-auth-dev3-01:4502",
+                  "LP": "http://webex-hk-dev.cisco.com"
+                },
+                {
+                  "name":"STG",
+                  "BL": "http://wbxapp-auth-stg3-01:4502",
+                  "LP": "http://webex-hk-stg.cisco.com"
+                },
+                {
+                  "name":"UAT",
+                  "BL": "http://wbxapp-auth-uat3-01:4502",
+                  "LP": "http://webex-hk-uat.cisco.com"
+                }
+            ]
+        }
+    ]
+}

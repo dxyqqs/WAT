@@ -1,0 +1,46 @@
+@keyframes focus{
+  from{
+    outline-offset: 100px;
+    outline-color: rgba(255, 0, 0, 0);
+  }
+  to{
+    outline-offset: 0;
+    outline-color: rgba(255, 0, 0, 0.5);
+  }
+
+
+}
+
+body{
+  font-family: 'Microsoft YaHei';
+  width:280px;
+  padding:12px 0;
+}
+a{
+  cursor: pointer;
+}
+.disabled{
+  color:#ccc !important;
+  cursor: not-allowed;
+}
+
+.disabled:hover{
+  text-decoration: none;
+}
+.options{
+  border-top:1px solid #ddd;
+}
+.focus{
+  outline-color: rgba(255,0,0,.2);
+  outline-style:solid;
+}
+.focus .focus{
+  outline: none;
+  color: rgba(255,0,0,.8)
+}
+.wcmmode{
+  padding-bottom:20px;
+}
+.need-add{
+
+}
