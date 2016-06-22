@@ -1,7 +1,7 @@
 {
   "name": "Cisco AEM Tool",
   "manifest_version":2,
-  "version": "1.0",
+  "version": "1.1",
   "description": "The first extension that I made.",
   "content_security_policy":"default-src 'self' 'unsafe-eval';connect-src *;script-src 'self' 'unsafe-eval';object-src 'self'",
   "browser_action": {
