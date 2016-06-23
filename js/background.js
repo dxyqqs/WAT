@@ -20,7 +20,7 @@ var _CFMode ='cf#',//经典模式
     _BgOption = {siteData:_SiteOption,optionsChecked:true};
 
 //序列化url
-function serializeURL(url){//序列化url
+function serializeURL(url){
    //获取url基本结构
    var urlReg1 = /(http(?:s)?)\:\/\/(?:([^\:\/]*)(?:\:(\d*))?)(?:\/(cf#|editor\.html)?)?(?:\/([^?#]+))*/,
    //获取查询字段
@@ -94,15 +94,15 @@ function browserAction(id,status){//是否禁用此插件
 chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
     activateTabChange&&activateTabChange(tabs[0]);
 });
-
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {//当窗口更新时,获取到窗口
+//当窗口更新时,获取到窗口
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   //确定tab update是当前的可视窗口
   if(changeInfo.status==='loading'&&('url' in tab)&&tab.active){
     activateTabChange&&activateTabChange(tab);
   }
 });
-
-chrome.tabs.onActivated.addListener(function(activeInfo){//切换tab时触发,需要获取tab对象
+//切换tab时触发,需要获取tab对象
+chrome.tabs.onActivated.addListener(function(activeInfo){
   chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
       activateTabChange&&activateTabChange(tabs[0]);
   });
@@ -111,14 +111,9 @@ chrome.tabs.onActivated.addListener(function(activeInfo){//切换tab时触发,�
 
 //获取popup进行通信，发送相关配置数据
 chrome.extension.onConnect.addListener(function(port) {
-
   port.onMessage.addListener(function(msg) {
-      console.log('################')
         if(msg.type === 'init'){
             port.postMessage({type:'init',data:_BgOption});
-        }else if(msg === 'checked'){
-            window.open('','1111111',"toolbar=yes, menubar=no, scrollbars=yes, resizable=yes,location=yes, status=yes,alwaysRaised=yes,depended=no")
         }
-
   });
 });

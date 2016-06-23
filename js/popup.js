@@ -38,8 +38,6 @@ var chromePost = function(ext){
     }
 }(chrome.extension);
 
-
-
 var re = React.createElement,
     rc = React.createClass,
     rd = ReactDOM.render;
@@ -215,7 +213,7 @@ chromePost.bind('init',function(data){
     console.log(data)
     var siteData =data.siteData;//获取option
     rd(re(WrapComponent,{display:'siteData' in data && data.siteData.length,data:data}),document.getElementById('container'))
-})
+}).send('init');
 
 
 
