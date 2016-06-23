@@ -14,7 +14,6 @@
     "http://*/"
   ],
   "background":{
-    "scripts": ["./js/background.js"]
+    "scripts": ["background.HTML"]
   }
-
 }
