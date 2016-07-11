@@ -118,7 +118,7 @@ function updateActiveWindow(){
             _OptionPage.tab = tab;
         }else{
             if(tab.id===_OptionPage.tab.id&&tab.windowId===_OptionPage.tab.windowId){//同位置窗口
-                if(tab.url !== OptionPage.tab.url){//地址已经改变
+                if(tab.url !== _OptionPage.tab.url){//地址已经改变
                     _OptionPage.status =false;
                     _OptionPage.tab = tab;
                 }
@@ -147,7 +147,7 @@ chrome.extension.onConnect.addListener(function(port) {
             _ExtOption =localStorage.AEMOptions?JSON.parse(localStorage.AEMOptions):{};
             _SiteOption='siteData' in _ExtOption?_ExtOption.siteData:[];
             _BgOption.siteData=_SiteOption;
-            _BgOption.optionPage = _OptionPage;//保存设置页面
+            //_BgOption.optionPage = _OptionPage;//保存设置页面
             chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
                 checkURL(tabs[0]);
                 port.postMessage({type:'init',data:_BgOption});
@@ -156,6 +156,25 @@ chrome.extension.onConnect.addListener(function(port) {
             _OptionPage.status = true;
         }else if(msg.type==='option_close'){//option.html打开
             _OptionPage.status = false;
+        }else if(msg.type==='popup_need_open_option_page'){//打开设置页面
+            var _update,
+                _windowId,
+                _id;
+            if(_OptionPage.status){
+                _update = {active:true};
+            }else{
+                _update = {url:'../option.html'};
+            }
+            if(_OptionPage.tab){
+                chrome.windows.update(_OptionPage.tab.windowId, {focused:true}, function (data){
+                    console.log(data)
+                    chrome.tabs.update(_OptionPage.tab.id,_update);
+
+                })
+            }else{
+                chrome.tabs.create({url:'../option.html'})
+            }
+
         }
   });
 });
