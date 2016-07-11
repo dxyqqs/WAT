@@ -1,34 +1,30 @@
-var AEMOptions=localStorage.AEMOptions?JSON.parse(localStorage.AEMOptions):
-    {
-        "siteData": [
-            {
-                "siteName": "zh_HK",
-                "sitePath": "/content/webex/global/zh_HK",
-                "siteHost": [
-                    {
-                      "name":"DEV",
-                      "BL": "http://wbxapp-auth-dev3-01:4502",
-                      "LP": "http://webex-hk-dev.cisco.com"
-                    },
-                    {
-                      "name":"STG",
-                      "BL": "http://wbxapp-auth-stg3-01:4502",
-                      "LP": "http://webex-hk-stg.cisco.com"
-                    },
-                    {
-                      "name":"UAT",
-                      "BL": "http://wbxapp-auth-uat3-01:4502",
-                      "LP": "http://webex-hk-uat.cisco.com"
-                    }
-                ]
-            }
-        ]
-    };
+
+var AEMOptions=localStorage.AEMOptions?JSON.parse(localStorage.AEMOptions): {siteData:[] };
+//通知background page option页面开启
+var port = chrome.extension.connect();
+port.onMessage.addListener(function(msg) {//获取配置后开始执行程序
+    console.log('done')
+});
+port.postMessage({type:'option_open'});
+
+window.addEventListener('beforeunload',function(){
+
+    port.postMessage({type:'option_close'});
+})
+
+
 //save data
 function saveOpt(){
   console.log(AEMOptions)
   localStorage.AEMOptions=JSON.stringify(AEMOptions);
 }
+//创建一个blob地址
+function createBlobURL(txt){
+    var _bArr = [txt],
+        _blob = new Blob(_bArr,{"type":"text/plan"});
+    return window.URL.createObjectURL(_blob);
+}
+
 
 var RC = React.createClass,
     RE = React.createElement,
@@ -267,14 +263,21 @@ var TableComponent = RC({
 var WrapComponent = RC({
     displayName:'WrapComponent',
     getInitialState:function(){
-      return {
-        tbody:AEMOptions.siteData,
-        FormComponentData:[],
-        title:'新增',
-        siteName:'',
-        sitePath:'',
-        save:'保存'
+      var _InitialState = {
+          tbody:"siteData"in AEMOptions?AEMOptions.siteData:[],
+          FormComponentData:[],
+          title:'新增',
+          siteName:'',
+          sitePath:'',
+          save:'保存',
+          fileValue:'',
+          download:''
+      };
+      //获取lg中的配置，生成文件提供下载
+      if(_InitialState.tbody.length>0){
+          _InitialState.download = createBlobURL(JSON.stringify(AEMOptions));
       }
+      return _InitialState;
     },
     getDefaultProps:function(){
       return {}
@@ -303,11 +306,44 @@ var WrapComponent = RC({
       this.dataIndex = dataIndex;
       return false;
     },
+    onClickImport:function(e){
+        this.refs.import.click();
+    },
+    onChangeImport:function(e){//读取文件
+        this.setState({fileValue:this.refs.import.value});
+        var ts =this;
+        if(this.refs.import.files[0]){
+            var fr = new FileReader();
+            fr.onload=function(e){
+                fr.onload=null;
+                try{
+                    console.log(e.target.result);
+                    var _json = JSON.parse(e.target.result);
+                    if(!('siteData' in _json)){
+                        throw new Error('data format error!')
+                    }else{
+                        AEMOptions=_json;
+                        //生成下载链接
+                        ts.setState({tbody:AEMOptions.siteData,download: createBlobURL(e.target.result)});
+                        saveOpt();
+                    }
+                }catch(e){
+                    return false;
+                }
+
+            };
+            //console.log(this.refs.import.files[0])
+            fr.readAsText(this.refs.import.files[0]);
+        }
+
+    },
     data_delete:function(e){
       var modal = $(e.target).parents('.modal')[0];
       $(modal).modal('hide');
       AEMOptions.siteData.splice(this.dataIndex,1);
-      this.setState({tbody:AEMOptions.siteData});
+      var o={tbody:AEMOptions.siteData};
+      o.download=AEMOptions.siteData.length>0?createBlobURL(JSON.stringify(AEMOptions)):'';
+      this.setState(o);
       //this.modal=null;
       this.dataIndex=-1;
       saveOpt();
@@ -334,7 +370,7 @@ var WrapComponent = RC({
         this.dataIndex=-1;
       }
       $(modal).modal('hide');
-      this.setState({tbody:AEMOptions.siteData});
+      this.setState({tbody:AEMOptions.siteData,download:createBlobURL(JSON.stringify(AEMOptions))});
       saveOpt();
     },
     onChangeHandle:function(e){//输入框检测
@@ -357,8 +393,10 @@ var WrapComponent = RC({
                   {className:'row'},
                   RE(
                       'div',
-                      null,
-                      RE(BtnComponent,{cls:'add',value:this.props.value ,onClick:this.onClickAdd}),
+                      {className:'header-wrap'},
+                      RE(BtnComponent,{cls:'add',value:this.props.add ,onClick:this.onClickAdd}),
+                      this.props.import?RE(BtnComponent,{cls:'add',value:this.props.import ,onClick:this.onClickImport}):null,
+                      this.props.import?RE('input',{ref:'import',type:'file',onChange:this.onChangeImport,value:this.state.fileValue}):null,
                       RE(HeaderComponent,{title:this.props.title})
                   ),
                   RE(
@@ -366,6 +404,7 @@ var WrapComponent = RC({
                       null,
                       RE(TableComponent,{tbody:this.state.tbody,thead:this.props.thead,onClickEdit:this.onClickEdit,onClickDelete:this.onClickDelete})
                   ),
+                  this.state.download?RE('a',{href:this.state.download,download:"WAT_OPtion.txt"},'保存配置'):null,
                   RE(ModalComponent,{title:'删除确认',ref:'deleteConfirm',Close:'取消',Save:'确定',clickHandle:this.data_delete},RE('span',null,RE('p',null,'确定删除'+this.state.deleteTitle+'？'))),
                   RE(ModalComponent,{title:this.state.title,ref:'myModal',Close:'取消',Save:this.state.save,clickHandle:this.data_add_edit},RE(FormComponent,{siteName:this.state.siteName,sitePath:this.state.sitePath,FormComponentData:this.state.FormComponentData}))
               )
@@ -377,7 +416,8 @@ RD(
       WrapComponent,
       {
         title:"添加站点",
-        value:'新增',
+        add:'新增',
+        import:'导入',
         thead:["siteName","sitePath","DEV","DEVLP","STG","STGLP","UAT","UATLP","操作"],
         tbody:AEMOptions.siteData
       }
