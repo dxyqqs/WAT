@@ -191,13 +191,23 @@ var WrapComponent = rc({
     },
     clickSetOption:function(){
         var optionPage = this.props.data.optionPage;
-        if(optionPage.status){//已存在此页面
-            chrome.tabs.update(optionPage.tab.id,{active:true});
-            window.close();
-        }else{
-            openTab('/option.html');
-
-        }
+        chromePost.bind('popup_need_open_option_page',function(){
+            //window.close();
+        }).send('popup_need_open_option_page');
+        //if(optionPage.status){//已存在此页面
+        //
+        //
+        //    chrome.windows.update(optionPage.tab.windowId, {focused:true}, function (data){
+        //        console.log(data)
+        //        chrome.tabs.update(optionPage.tab.id,{active:true});
+        //        window.close();
+        //    })
+        //
+        //
+        //}else{
+        //    openTab('/option.html');
+        //
+        //}
 
     },
     checkChangeHandle:function(e){
