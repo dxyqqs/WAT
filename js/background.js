@@ -10,6 +10,7 @@ var _CFMode ='cf#',//经典模式
 
     _WCMMode='siteadmin#',//wcm
 
+    _OptionPage = {tab:null,status:false},//保存已打开的option.html
     //获取当前扩展的配置数据
     _ExtOption =localStorage.AEMOptions?JSON.parse(localStorage.AEMOptions):{},
 
@@ -18,6 +19,18 @@ var _CFMode ='cf#',//经典模式
 
     //背景页需要组装的数据，与当前站点相关
     _BgOption = {siteData:_SiteOption,optionsChecked:true};
+
+//创建延迟对象
+var  getDeferred=function($){
+
+    var def = $.Deferred();
+
+    return function(){
+
+        return def;
+    }
+
+}(jQuery);
 
 //序列化url
 function serializeURL(url){
@@ -46,11 +59,9 @@ function serializeURL(url){
 
 function checkURL(tab){//检测当前页面url地址是否匹配设置地址，并返回设置项
     var obj  = serializeURL(tab.url);
-    console.log('tab changed!')
+
     if(obj){//如果当前地址为空
-      if(obj.type=='editor.html'&&_BgOption.optionsChecked){//自动切换触屏模式到经典模式
-          chrome.tabs.update(tab.id, {url: obj.href.replace('editor.html','cf#')});
-      }
+      //console.log(obj)
       _BgOption.tab = tab;//保存当前活动tab页的info
       _BgOption.location = obj;//保存当前页面的地址对象
       if(_BgOption.siteData){
@@ -74,12 +85,9 @@ function checkURL(tab){//检测当前页面url地址是否匹配设置地址，�
       }
 
 
+
     }
 
-}
-
-function activateTabChange(tab){//始终只获取当前活动的窗口
-    checkURL(tab);
 }
 
 function browserAction(id,status){//是否禁用此插件
@@ -90,30 +98,64 @@ function browserAction(id,status){//是否禁用此插件
     }
 }
 
-//{.....开始捕获当前活动窗口
-chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-    activateTabChange&&activateTabChange(tabs[0]);
-});
-//当窗口更新时,获取到窗口
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  //确定tab update是当前的可视窗口
-  if(changeInfo.status==='loading'&&('url' in tab)&&tab.active){
-    activateTabChange&&activateTabChange(tab);
-  }
-});
-//切换tab时触发,需要获取tab对象
-chrome.tabs.onActivated.addListener(function(activeInfo){
-  chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-      activateTabChange&&activateTabChange(tabs[0]);
-  });
-})
-//捕获结束....}
+//捕获当前活动窗口
+function updateActiveWindow(){
+
+
+    //当窗口更新时,获取到窗口
+    chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+        //确定tab update是当前的可视窗口
+        if(changeInfo.status==='loading'&&('url' in tab)&&tab.active){
+            var obj  = serializeURL(tab.url);
+            if(obj) {//如果当前地址为空
+                if (obj.type == 'editor.html' && _BgOption.optionsChecked) {//自动切换触屏模式到经典模式
+                    chrome.tabs.update(tab.id, {url: obj.href.replace('editor.html', 'cf#')});
+                }
+            }
+        }
+        // todo: need test
+        if(!_OptionPage.status){
+            _OptionPage.tab = tab;
+        }else{
+            if(tab.id===_OptionPage.tab.id&&tab.windowId===_OptionPage.tab.windowId){//同位置窗口
+                if(tab.url !== OptionPage.tab.url){//地址已经改变
+                    _OptionPage.status =false;
+                    _OptionPage.tab = tab;
+                }
+            }
+        }
+    });
+    //切换tab时触发,需要获取tab对象
+    //chrome.tabs.onActivated.addListener(function(activeInfo){
+    //    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+    //        checkURL(tabs[0]);
+    //    });
+    //})
+
+
+}
+
+updateActiveWindow();
 
 //获取popup进行通信，发送相关配置数据
 chrome.extension.onConnect.addListener(function(port) {
   port.onMessage.addListener(function(msg) {
+        console.log(msg)
         if(msg.type === 'init'){
-            port.postMessage({type:'init',data:_BgOption});
+            //AEMOptions会动态插入数据，所以每次都要获取
+            console.log('init');
+            _ExtOption =localStorage.AEMOptions?JSON.parse(localStorage.AEMOptions):{};
+            _SiteOption='siteData' in _ExtOption?_ExtOption.siteData:[];
+            _BgOption.siteData=_SiteOption;
+            _BgOption.optionPage = _OptionPage;//保存设置页面
+            chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+                checkURL(tabs[0]);
+                port.postMessage({type:'init',data:_BgOption});
+            });
+        }else if(msg.type==='option_open'){//option.html打开
+            _OptionPage.status = true;
+        }else if(msg.type==='option_close'){//option.html打开
+            _OptionPage.status = false;
         }
   });
 });

@@ -87,7 +87,7 @@ var TableComponent = rc({
           var _arr = [];
 
           for(var i=0;i<data.length;i++){
-              console.log(data[i]);
+              //console.log(data[i]);
               var wcm = data[i].BL.replace(/\/$/,'')+'/siteadmin#/'+this.props.sitePath.replace(/^\/|\/$/,''),
                   BluePrint = wcm.replace(/\/siteadmin#\//,'/cf#/')+'/index.html',
                   LiveCopy = data[i].LP;
@@ -190,7 +190,15 @@ var WrapComponent = rc({
         openTab(this.props.data.tab.url.replace(/\?#[^?#]*$/,'')+'?wcmmode=disabled',this.props.data.tab)
     },
     clickSetOption:function(){
-        openTab('/option.html');
+        var optionPage = this.props.data.optionPage;
+        if(optionPage.status){//已存在此页面
+            chrome.tabs.update(optionPage.tab.id,{active:true});
+            window.close();
+        }else{
+            openTab('/option.html');
+
+        }
+
     },
     checkChangeHandle:function(e){
         console.log(e.target.checked)
