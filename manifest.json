@@ -11,9 +11,11 @@
   "options_page":"option.html",
   "permissions": [
     "tabs",
-    "http://*/"
+    "<all_urls>"
   ],
   "background":{
     "page": "background.HTML"
-  }
+  },
+  "devtools_page": "devtools.html"
+
 }
