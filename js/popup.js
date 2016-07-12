@@ -1,3 +1,5 @@
+//todo:间距测量
+
 function openTab(url,tab){
   var tabObj=tab;
   if(tabObj){

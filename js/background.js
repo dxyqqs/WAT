@@ -1,8 +1,7 @@
 /*
   1.获取localstorage数据
   2.当前页面地址是否命中ls中数据
-  3.1.如果命中在popup中进行反馈
-  3.2.如果没有命中则解析地址询问是否添加
+
  */
 var _CFMode ='cf#',//经典模式
 
@@ -31,6 +30,24 @@ var  getDeferred=function($){
     }
 
 }(jQuery);
+
+//$.cookie("ObFormLoginCookie","wh%3Dsso-prod2%20wu%3D%2Fautho%2Ffed%2Finternal%2Fidpredirect.html%3FresumePath%3D%252Fidp%252FKCVcq%252FresumeSAML20%252Fidp%252FSSO.ping%20wo%3D1%20rh%3Dhttps%3A%2F%2Fsso.cisco.com%20ru%3D%252Fautho%252Ffed%252Finternal%252Fidpredirect.html%20rq%3DresumePath%253D%25252Fidp%25252FKCVcq%25252FresumeSAML20%25252Fidp%25252FSSO.ping")
+//$.cookie('ObSSOCookie','loggedoutcontinue')
+
+//todo:bug 平台登录
+//$.ajax({
+//    url:'https://rally1.rallydev.com/#/27014070531d/custom/30067539839',
+//    type:'post',
+//    data:{userid:'xiaoyden',password:'Mar!2016'},
+//    beforeSend:function(xhr){
+//        //xhr.setRequestHeader('Cookie','ObFormLoginCookie=wh%3Dsso-prod2%20wu%3D%2Fautho%2Ffed%2Finternal%2Fidpredirect.html%3FresumePath%3D%252Fidp%252FKCVcq%252FresumeSAML20%252Fidp%252FSSO.ping%20wo%3D1%20rh%3Dhttps%3A%2F%2Fsso.cisco.com%20ru%3D%252Fautho%252Ffed%252Finternal%252Fidpredirect.html%20rq%3DresumePath%253D%25252Fidp%25252FKCVcq%25252FresumeSAML20%25252Fidp%25252FSSO.ping; ObSSOCookie=loggedoutcontinue')
+//    }
+//}).complete(function(xhr){
+//    console.log(arguments)
+//})
+
+
+
 
 //序列化url
 function serializeURL(url){
