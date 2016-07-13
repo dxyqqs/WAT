@@ -93,13 +93,14 @@ var TableComponent = rc({
               var wcm = data[i].BL.replace(/\/$/,'')+'/siteadmin#/'+this.props.sitePath.replace(/^\/|\/$/,''),
                   BluePrint = wcm.replace(/\/siteadmin#\//,'/cf#/')+'/index.html',
                   LiveCopy = data[i].LP;
+              console.log(data[i]);
               _arr.push(
                   re(
                       'tr',
                       {key:i},
-                      re('td',null,re('a',{href:'#',"data-href":wcm},data[i].name)),
-                      re('td',null,re('a',{href:'#',"data-href":BluePrint},'BluePrint')),
-                      re('td',null,re('a',{href:'#',"data-href":LiveCopy},'LiveCopy'))
+                      re('td',null,re('a',{href:'#',"data-href":wcm,className:data[i].BL?'':'disabled'},data[i].name)),
+                      re('td',null,re('a',{href:'#',"data-href":BluePrint,className:data[i].BL?'':'disabled'},'BluePrint')),
+                      re('td',null,re('a',{href:'#',"data-href":LiveCopy,className:data[i].LP?'':'disabled'},'LiveCopy'))
                     )
               )
           }
@@ -178,13 +179,16 @@ var WrapComponent = rc({
         this.setState({tableData:this.props.data.siteData[i].siteHost,selectValue:this.props.data.siteData[i].siteName,sitePath:this.props.data.siteData[i].sitePath})
     },
     TDClickHandle:function(e){
-        if(e.target.dataset.href.indexOf('siteadmin')>-1){
-            openWindow(e.target.dataset.href, e.target.innerHTML);
-            chrome.tabs.update(this.props.data.tab.id,{active:true});
+        if(!e.target.classList.contains('disabled')){
+            if(e.target.dataset.href.indexOf('siteadmin')>-1){
+                openWindow(e.target.dataset.href, e.target.innerHTML);
+                chrome.tabs.update(this.props.data.tab.id,{active:true});
 
-        }else{
-            openTab(e.target.dataset.href)
+            }else{
+                openTab(e.target.dataset.href)
+            }
         }
+
     },
     BtnClickHandle:function(){
         console.log(this.props.data.tab.url.replace(/\?[^?]*$/,'')+'?wcmmode=disabled')
