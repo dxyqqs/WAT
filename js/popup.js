@@ -197,9 +197,7 @@ var WrapComponent = rc({
     },
     clickSetOption:function(){
         var optionPage = this.props.data.optionPage;
-        chromePost.bind('popup_need_open_option_page',function(){
-            //window.close();
-        }).send('popup_need_open_option_page');
+        chromePost.bind('popup_need_open_option_page').send('popup_need_open_option_page');
         //if(optionPage.status){//已存在此页面
         //
         //
