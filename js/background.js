@@ -129,18 +129,19 @@ function updateActiveWindow(){
                     chrome.tabs.update(tab.id, {url: obj.href.replace('editor.html', 'cf#')});
                 }
             }
-        }
-        // todo: need test
-        if(!_OptionPage.status){
-            _OptionPage.tab = tab;
-        }else{
-            if(tab.id===_OptionPage.tab.id&&tab.windowId===_OptionPage.tab.windowId){//同位置窗口
-                if(tab.url !== _OptionPage.tab.url){//地址已经改变
-                    _OptionPage.status =false;
-                    _OptionPage.tab = tab;
+            // todo: need test
+            if(!_OptionPage.status){
+                _OptionPage.tab = tab;
+            }else{
+                if(tab.id===_OptionPage.tab.id&&tab.windowId===_OptionPage.tab.windowId){//同位置窗口
+                    if(tab.url !== _OptionPage.tab.url){//地址已经改变
+                        _OptionPage.status =false;
+                        _OptionPage.tab = tab;
+                    }
                 }
             }
         }
+
     });
     //切换tab时触发,需要获取tab对象
     //chrome.tabs.onActivated.addListener(function(activeInfo){
@@ -179,18 +180,17 @@ chrome.extension.onConnect.addListener(function(port) {
                 _id;
             if(_OptionPage.status){
                 _update = {active:true};
-            }else{
-                _update = {url:'../option.html'};
-            }
-            if(_OptionPage.tab){
-                chrome.windows.update(_OptionPage.tab.windowId, {focused:true}, function (data){
+                chrome.windows.update(_OptionPage.tab.windowId, {focused:true}, function (data){//窗口聚焦
                     console.log(data)
-                    chrome.tabs.update(_OptionPage.tab.id,_update);
+                    chrome.tabs.update(_OptionPage.tab.id,{active:true});//tab聚焦
 
                 })
             }else{
+                //如果没有保存设置页，则新建
+                //window.open('../option.html',"toolbar=yes, menubar=no, scrollbars=yes, resizable=yes,location=yes, status=yes,alwaysRaised=yes,depended=no");
                 chrome.tabs.create({url:'../option.html'})
             }
+
 
         }
   });
