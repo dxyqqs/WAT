@@ -117,8 +117,6 @@ function browserAction(id,status){//是否禁用此插件
 
 //捕获当前活动窗口
 function updateActiveWindow(){
-
-
     //当窗口更新时,获取到窗口
     chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
         //确定tab update是当前的可视窗口
