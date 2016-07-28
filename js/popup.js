@@ -193,7 +193,7 @@ var WrapComponent = rc({
     BtnClickHandle:function(){
         console.log(this.props.data.tab.url.replace(/\?[^?]*$/,'')+'?wcmmode=disabled')
         //this.props.data.tab.url=this.props.data.tab.url.replace(/\?[^?]*$/,'')+'?wcmmode=disabled';
-        openTab(this.props.data.tab.url.replace(/\?#[^?#]*$/,'')+'?wcmmode=disabled',this.props.data.tab)
+        openTab(this.props.data.tab.url.replace(/(?:(?:\?|#)[^?#]*)*$/,'')+'?wcmmode=disabled',this.props.data.tab)
     },
     clickSetOption:function(){
         var optionPage = this.props.data.optionPage;
